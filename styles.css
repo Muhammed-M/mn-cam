@@ -1,0 +1,355 @@
+/* Guest camera — engagement party
+   Design language: Apple-inspired (see design/apple/DESIGN.md), light.
+   Parchment canvas, white 18px cards, SF Pro / Inter tracked tight, pills for every action.
+   Engagement touches: Cormorant Garamond for the couple, one champagne accent for tiny details,
+   near-black pills instead of store-blue. */
+
+@font-face {
+  font-family: "Cormorant Garamond"; font-style: normal; font-weight: 500; font-display: swap;
+  src: url(fonts/cormorant-500.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Cormorant Garamond"; font-style: italic; font-weight: 500; font-display: swap;
+  src: url(fonts/cormorant-500-italic.woff2) format("woff2");
+}
+/* Only downloaded where SF Pro isn't available (Android). */
+@font-face {
+  font-family: "Inter"; font-style: normal; font-weight: 300 600; font-display: swap;
+  src: url(fonts/inter-var.woff2) format("woff2");
+}
+
+:root {
+  --ink: #1d1d1f;
+  --red: #ff3b30;
+  --ink-80: #333336;
+  --ink-48: #7a7a7a;
+  --canvas: #ffffff;
+  --parchment: #f5f5f7;
+  --line-soft: rgba(0, 0, 0, 0.08);
+  --chip: rgba(210, 210, 215, 0.64);
+  --chip-press: rgba(190, 190, 196, 0.8);
+  --focus: #0071e3;
+  --gold: #a8875a;            /* champagne: small details only */
+  --green: #248a3d;
+  --orange: #b25000;
+  --tile: #1d1d1f;            /* viewfinder */
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+  --serif: "Cormorant Garamond", "New York", ui-serif, Georgia, serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --product-shadow: 3px 5px 30px rgba(0, 0, 0, 0.22);
+
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.022em;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+body { overflow: hidden; touch-action: manipulation; }
+
+button {
+  font: inherit; color: inherit; letter-spacing: inherit;
+  background: none; border: 0; padding: 0; cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none; user-select: none;
+}
+button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+[hidden] { display: none !important; }
+/* Names come from js/couple.js; hidden until filled in so the old text never flashes. */
+[data-couple] { visibility: hidden; }
+.couple-ready [data-couple] { visibility: visible; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.ic {
+  width: 22px; height: 22px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.7;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+.screen { position: fixed; inset: 0; }
+
+/* ───────── Pills (active = scale .95, the Apple micro-interaction) ───────── */
+.pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 48px; padding: 0 24px; border-radius: 9999px;
+  font-size: 17px; font-weight: 400; line-height: 1; letter-spacing: -0.022em;
+  white-space: nowrap;
+  transition: transform .15s var(--ease), background-color .15s, opacity .15s;
+}
+.pill:active { transform: scale(0.95); }
+.pill-ink { background: var(--ink); color: #fff; }
+.pill-ink:active { background: #000; }
+.pill-white { background: #fff; color: var(--ink); }
+.pill-ghost-light { border: 1px solid rgba(255, 255, 255, 0.7); color: #fff; }
+.pill-lg { width: 100%; height: 54px; font-size: 17px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 14px 0 12px; border-radius: 9999px;
+  background: var(--canvas); color: var(--ink-80);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  font-size: 14px; line-height: 1; letter-spacing: -0.016em; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: transform .15s var(--ease);
+}
+.chip .ic { width: 16px; height: 16px; }
+
+/* ───────── Welcome ───────── */
+.welcome {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 28px;
+  padding: calc(var(--sat) + 7vh) calc(var(--sar) + 20px) calc(var(--sab) + 20px) calc(var(--sal) + 20px);
+  overflow-y: auto;
+  background: var(--parchment);
+}
+.welcome-hero {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.rings { width: 52px; height: 30px; margin-bottom: 18px; fill: none; stroke: var(--gold); stroke-width: 1.4; }
+.rings path { fill: var(--gold); stroke: none; }
+
+.eyebrow {
+  font-size: 12px; font-weight: 600; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold);
+}
+.names {
+  margin: 18px 0 16px;
+  display: flex; flex-direction: column; align-items: center;
+  font-family: var(--serif); font-weight: 500;
+  font-size: clamp(54px, 17vw, 76px); line-height: 0.98; letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.names .amp {
+  font-style: italic; font-size: 0.58em; line-height: 1.15; color: var(--gold);
+}
+.date {
+  font-size: 14px; line-height: 1.43; letter-spacing: -0.016em; color: var(--ink-48);
+}
+.lede {
+  margin-top: 34px;
+  font-family: var(--display);
+  font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em;
+}
+.sub {
+  margin-top: 8px; max-width: 30ch;
+  font-size: 17px; font-weight: 300; line-height: 1.47; color: var(--ink-80);
+}
+
+.welcome-card {
+  width: 100%; max-width: 440px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px; border-radius: 26px;
+  background: var(--canvas); box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+.field input {
+  width: 100%; height: 52px; padding: 0 20px;
+  border-radius: 9999px; border: 1px solid transparent; background: var(--parchment);
+  color: var(--ink); font: inherit; font-size: 17px; /* ≥16px: no iOS zoom */
+  text-align: center; letter-spacing: -0.022em;
+  transition: border-color .15s, background-color .15s;
+}
+.field input::placeholder { color: var(--ink-48); }
+.field input:focus { outline: none; background: #fff; border-color: var(--focus); }
+.fineprint {
+  font-size: 12px; line-height: 1.4; letter-spacing: -0.01em; color: var(--ink-48);
+  text-align: center; padding: 2px 8px 2px;
+}
+
+.welcome-status {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 22px;
+  padding: 9px 16px; border-radius: 18px; max-width: 34ch;
+  background: var(--canvas); box-shadow: inset 0 0 0 1px var(--line-soft);
+  font-size: 14px; line-height: 1.35; letter-spacing: -0.016em; text-align: left; color: var(--ink-80);
+}
+.welcome-status .ic { width: 16px; height: 16px; }
+[data-state="done"] > .ic { color: var(--green); }
+[data-state="offline"] > .ic { color: var(--orange); }
+.mini-spin {
+  width: 13px; height: 13px; border-radius: 50%; flex: none;
+  border: 2px solid rgba(0, 0, 0, 0.12); border-top-color: var(--ink);
+  animation: rot .8s linear infinite;
+}
+
+/* ───────── Camera ───────── */
+.camera {
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--parchment);
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+.cam-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(var(--sat) + 8px) calc(var(--sar) + 16px) 12px calc(var(--sal) + 16px);
+}
+.cam-top::after { content: ""; width: 44px; } /* keeps counter centred when flash is hidden */
+.cam-top:has(#btn-flash:not([hidden]))::after { display: none; }
+
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--chip); color: var(--ink);
+  transition: transform .15s var(--ease), background-color .15s, color .15s;
+}
+.icon-btn:active { transform: scale(0.95); background: var(--chip-press); }
+.icon-btn-lg { width: 52px; height: 52px; }
+.icon-btn-lg .ic { width: 24px; height: 24px; }
+#btn-flash[aria-pressed="true"] { background: var(--ink); color: #fff; }
+#btn-flash[aria-pressed="true"] .ic { fill: currentColor; }
+#btn-switch.spin .ic { animation: spin .45s var(--ease); }
+/* Round controls + thumbnail turn to face the guest when the phone is held sideways. */
+#btn-flash .ic, #btn-switch .ic { transform: rotate(var(--icon-rot, 0deg)); transition: transform .3s var(--ease); }
+@keyframes spin { from { transform: rotate(var(--icon-rot, 0deg)); } to { transform: rotate(calc(var(--icon-rot, 0deg) + 180deg)); } }
+
+.counter {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 34px; padding: 0 15px 0 13px; border-radius: 9999px;
+  background: var(--canvas); box-shadow: inset 0 0 0 1px var(--line-soft);
+  font-size: 15px; font-weight: 600; letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.counter::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+#shot-count { display: inline-block; min-width: 3ch; text-align: center; }
+
+/* The viewfinder is a 3:4 photo tile — and photos are cropped to exactly what it shows. */
+.vf-wrap {
+  display: grid; place-items: center; min-height: 0;
+  padding: 0 calc(var(--sar) + 12px) 0 calc(var(--sal) + 12px);
+  container-type: size;
+}
+.viewfinder {
+  position: relative; overflow: hidden;
+  width: 100%; height: 100%;
+  width: min(100cqw, 100cqh * 3 / 4); height: min(100cqh, 100cqw * 4 / 3);
+  border-radius: 18px; background: var(--tile);
+  transform: translateZ(0); /* clip video corners on iOS */
+  container-type: size;
+}
+.viewfinder video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0; transition: opacity .3s;
+}
+.viewfinder video.live { opacity: 1; }
+.viewfinder video.mirror { transform: scaleX(-1); }
+.blink { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+
+.cam-message {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 24px; text-align: center; color: #fff;
+}
+.cam-message h2 { font-family: var(--display); font-size: 21px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.19; }
+.cam-message p { font-size: 15px; line-height: 1.45; color: #cccccc; max-width: 32ch; }
+.cam-message p:empty, .cam-message h2:empty { display: none; }
+.cam-msg-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; width: 100%; max-width: 260px; }
+.cam-msg-actions .pill { width: 100%; height: 46px; font-size: 16px; }
+.spinner {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #fff;
+  animation: rot .8s linear infinite;
+}
+@keyframes rot { to { transform: rotate(360deg); } }
+
+.cam-bottom {
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 14px calc(var(--sar) + 28px) calc(var(--sab) + 20px) calc(var(--sal) + 28px);
+}
+.cam-row { display: flex; justify-content: center; gap: 8px; min-height: 34px; }
+.cam-controls { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+
+.thumb {
+  justify-self: start; width: 52px; height: 52px; border-radius: 11px; overflow: hidden;
+  background: #e8e8ed; border: 2px solid #fff; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+  opacity: 0; transition: opacity .2s, transform .3s var(--ease);
+  pointer-events: none;
+  transform: rotate(var(--icon-rot, 0deg));
+}
+.thumb.has { opacity: 1; }
+.thumb.ready { pointer-events: auto; }
+.thumb:active { transform: rotate(var(--icon-rot, 0deg)) scale(0.92); }
+.thumb canvas { display: block; width: 100%; height: 100%; }
+
+/* ───────── Last-photo preview ───────── */
+.preview {
+  position: absolute; inset: 0; z-index: 20;
+  display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 22px;
+  padding: calc(var(--sat) + 20px) calc(var(--sar) + 16px) calc(var(--sab) + 24px) calc(var(--sal) + 16px);
+  background: var(--parchment);
+}
+.preview-stage { container-type: size; display: grid; place-items: center; min-height: 0; }
+.preview-stage img {
+  display: block; max-width: 100cqw; max-height: 100cqh;
+  border-radius: 18px; box-shadow: var(--product-shadow);
+}
+.preview-stage img.counter-rot { max-width: 100cqh; max-height: 100cqw; transform: rotate(var(--vrot)); }
+.preview .pill { justify-self: center; min-width: 220px; }
+#btn-switch { justify-self: end; }
+
+.shutter {
+  position: relative; width: 78px; height: 78px; border-radius: 50%;
+  border: 3px solid var(--ink); padding: 5px;
+}
+.shutter span {
+  display: block; width: 100%; height: 100%; border-radius: 50%; background: var(--ink);
+  transition: transform .09s var(--ease), background-color .09s;
+}
+.shutter:active span, .shutter.press span { transform: scale(0.86); background: #48484a; }
+.shutter:disabled { opacity: .35; }
+
+.screen-flash {
+  position: fixed; inset: 0; z-index: 50; pointer-events: none;
+  background: #fffaf2; opacity: 0; transition: opacity .08s;
+}
+.screen-flash.on { opacity: 1; }
+
+.toast {
+  position: fixed; z-index: 60; left: 50%; bottom: calc(var(--sab) + 200px);
+  transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+  max-width: calc(100vw - 48px); width: max-content;
+  padding: 10px 18px; border-radius: 9999px;
+  background: rgba(245, 245, 247, 0.85); color: var(--ink);
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  font-size: 14px; line-height: 1.43; letter-spacing: -0.016em; text-align: center;
+  transition: opacity .2s, transform .25s var(--ease);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ───────── Portrait lock ─────────
+   When the phone turns and the browser rotates the page, JS turns #app back
+   (see orientation.js) so the layout always stays portrait to the phone. */
+#app { position: fixed; inset: 0; transform-origin: 50% 50%; }
+#app.rot-90 {
+  --sat: env(safe-area-inset-left, 0px); --sab: env(safe-area-inset-right, 0px);
+  --sal: env(safe-area-inset-bottom, 0px); --sar: env(safe-area-inset-top, 0px);
+}
+#app.rot-270 {
+  --sat: env(safe-area-inset-right, 0px); --sab: env(safe-area-inset-left, 0px);
+  --sal: env(safe-area-inset-top, 0px); --sar: env(safe-area-inset-bottom, 0px);
+}
+/* The camera feed turns with the world, so un-turn it to keep the viewfinder a true window. */
+.viewfinder video.counter-rot {
+  inset: auto; left: 50%; top: 50%; width: 100cqh; height: 100cqw;
+  transform: translate(-50%, -50%) rotate(var(--vrot));
+}
+.viewfinder video.counter-rot.mirror { transform: translate(-50%, -50%) rotate(var(--vrot)) scaleX(-1); }
+.thumb canvas.counter-rot { transform: rotate(var(--vrot)); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+}

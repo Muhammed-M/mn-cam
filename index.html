@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f7">
+  <meta name="color-scheme" content="light only">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Groom &amp; Bride · Engagement</title>
+  <meta name="description" content="Share the night with us.">
+  <link rel="preload" href="fonts/cormorant-500.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ───────── Welcome ───────── -->
+  <main id="welcome" class="screen welcome">
+    <div class="welcome-hero">
+      <svg class="rings" viewBox="0 0 56 32" aria-hidden="true">
+        <circle cx="21" cy="17" r="11"/><circle cx="35" cy="17" r="11"/>
+        <path d="M35 2.6l2.2 2.6-2.2 2.4-2.2-2.4z"/>
+      </svg>
+      <p class="eyebrow">Engagement Party</p>
+      <h1 class="names">
+        <span data-couple="groom">Groom</span>
+        <span class="amp">&amp;</span>
+        <span data-couple="bride">Bride</span>
+      </h1>
+      <p class="date">Friday · 27 November 2026</p>
+
+      <div id="live-copy">
+        <p class="lede">Share the night with us.</p>
+        <p class="sub">Capture the moments you love — every photo comes straight to us.</p>
+      </div>
+      <div id="wrap-copy" hidden>
+        <p class="lede">Thank you for sharing the night with us.</p>
+        <p class="sub">The night is over — the memories are just arriving.</p>
+      </div>
+      <p class="welcome-status" id="welcome-status" role="status" hidden></p>
+    </div>
+
+    <form id="start-form" class="welcome-card" autocomplete="off">
+      <label class="field">
+        <span class="sr-only">Your name</span>
+        <input id="guest-name" name="guest" type="text" maxlength="40" inputmode="text"
+               autocapitalize="words" enterkeyhint="go" placeholder="Your name (optional)">
+      </label>
+      <button id="btn-start" class="pill pill-ink pill-lg" type="submit">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.3l1.3-1.8A1.5 1.5 0 0 1 10.3 3.5h3.4a1.5 1.5 0 0 1 1.2.7L16.2 6h1.3A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.3" r="3.6"/></svg>
+        <span id="btn-start-label">Open Camera</span>
+      </button>
+      <p class="fineprint">No internet? Your photos are saved on your phone and sent automatically once you’re back online.</p>
+    </form>
+  </main>
+
+  <!-- ───────── Camera ───────── -->
+  <section id="camera" class="screen camera" hidden aria-label="Camera">
+    <header class="cam-top">
+      <button id="btn-back" class="icon-btn" type="button" aria-label="Back">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="counter" aria-label="Photos taken"><span id="shot-count">000</span></div>
+      <button id="btn-flash" class="icon-btn" type="button" aria-label="Flash" aria-pressed="false" hidden>
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2.5L5.5 13.5h5.5L10 21.5l8.5-11.5H13z"/></svg>
+      </button>
+    </header>
+
+    <div class="vf-wrap">
+      <div class="viewfinder" id="viewfinder">
+        <video id="video" playsinline muted autoplay disablepictureinpicture></video>
+        <div class="blink" id="blink"></div>
+        <div class="cam-message" id="cam-message" hidden>
+          <div class="spinner" id="cam-spinner" hidden></div>
+          <h2 id="cam-msg-title"></h2>
+          <p id="cam-msg-body"></p>
+          <div class="cam-msg-actions">
+            <button id="btn-retry" class="pill pill-white" type="button" hidden>Try again</button>
+            <button id="btn-native-fallback" class="pill pill-ghost-light" type="button" hidden>Use phone camera</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="cam-bottom">
+      <div class="cam-row">
+        <div class="chip" id="send-status" role="status" aria-live="polite" hidden></div>
+      </div>
+      <div class="cam-controls">
+        <button class="thumb" id="thumb" type="button" aria-label="See your last photo"><canvas id="thumb-canvas" width="112" height="112"></canvas></button>
+        <button id="shutter" class="shutter" type="button" aria-label="Take photo"><span></span></button>
+        <button id="btn-switch" class="icon-btn icon-btn-lg" type="button" aria-label="Switch camera">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9M4 13a8 8 0 0 0 14.3 4.9"/><path d="M20 4.5V11h-6.5M4 19.5V13h6.5"/></svg>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Last-photo preview -->
+    <div class="preview" id="preview" hidden role="dialog" aria-label="Your last photo">
+      <div class="preview-stage"><img id="preview-img" alt="Your last photo"></div>
+      <button id="btn-preview-close" class="pill pill-ink" type="button">Keep shooting</button>
+    </div>
+
+    <input id="native-input" type="file" accept="image/*" capture="environment" hidden>
+  </section>
+
+  <div class="screen-flash" id="screen-flash" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+</body>
+</html>

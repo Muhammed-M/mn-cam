@@ -4,7 +4,7 @@
 // a page someone is shooting with.
 //
 // Bump VERSION on each release so old caches are cleaned up.
-const VERSION = '2026-11-20.2';
+const VERSION = '2026-11-20.3';
 const CACHE = `nm-cam-${VERSION}`;
 const CORE = [
   'index.html', 'styles.css',
